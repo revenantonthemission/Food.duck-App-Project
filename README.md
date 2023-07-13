@@ -91,7 +91,7 @@ json의 형식은 다음과 같이 정리된다:
     f1 -->|N| f21["Check Local DB"]
     f21 -->|N| f211["Error"]
     f21 -->|Y| f212["End"]
-    f1 -->|N| f22["Fetch Data"]
+    f1 -->|Y| f22["Fetch Data"]
     f22 -->|N| f21
     f22 -->|Y| f222["Check Local + Load"]
     f222 -->|N| f2221["Edit Local"] --> f22210["End"]
