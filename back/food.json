@@ -1,0 +1,30 @@
+[
+   {
+      "name" : "A",
+      "address" : "p1",
+      "category" : "한식",
+      "trav_time" : "1",
+      "tag" : [
+         "t1","t2","t3" 
+      ],
+      "opentime" : ["09:30"
+      ],
+      "closetime" : ["19:00"
+      ],
+      "image" : "urlurlurlurl"
+   },
+   {
+      "name" : "B",
+      "address" : "p2",
+      "category" : "일식",
+      "trav_time" : "2",
+      "tag" : [
+         "t3","t4"
+      ],
+      "opentime" : ["09:00"
+      ],
+      "closetime" : ["20:00"
+      ],
+      "image" : "urlurlurlurl"
+   }
+]
