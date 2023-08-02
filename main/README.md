@@ -1,9 +1,16 @@
-# 메인 릴리스 폴더입니다.
+# project2307
 
-프론트, 백엔드 팀의 코드가 합쳐진, 최종 빌드 폴더입니다.  
-이 폴더의 코드는 항상 빌드가 가능하게 유지하여 주세요.
+A new Flutter project.
 
-새로운 기능을 추가하는 경우, Development 는 이 곳에서 하지 말아주세요. 합치는 사람이 속한 파트에서 Integrate를 한 후, 정상적으로 작동되는 경우에만 이 폴더로 옮겨주시길 바랍니다.
+## Getting Started
 
-## Changelogs
-- V 0.1: Create Main Release Folder
+This project is a starting point for a Flutter application.
+
+A few resources to get you started if this is your first Flutter project:
+
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.
