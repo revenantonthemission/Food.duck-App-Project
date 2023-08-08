@@ -16,7 +16,7 @@
 
 ## Todo
 - Make app interface and pages
-- Firebase integration
+- Firebase integration [V]
 
 <hr>
 
@@ -29,7 +29,7 @@
 json(JavaScript Object Notation)은 JavaScript 객체의 형식으로 기록한 데이터다. json으로 저장된 데이터는 JavaScript의 객체 형식을 직, 간접적으로 사용하는 언어에서 javaScript 객체로 파싱하여 사용할 수 있다.
 json의 형식은 다음과 같이 정리된다:
 - 중괄호는 객체를 의미한다. 중괄호 안에는 객체의 데이터가 들어간다.
-- 객체의 모든 property-value는 기본적으로 Map<String, dynamic> 형태이다. 즉, 객체의 모든 property는 문자열의 형태로 그 이름이 저장된다. 문자열 다음에는 속성의 값이 나열 되며, property와 value는 :로 구분되고 데이터 쌍 끼리는 ,로 구분된다.
+- 객체의 모든 property-value는 기본적으로 Map<dynamic, dynamic> 형태이다.
 - 대괄호는 배열을 의미한다. 배열 안에는 dynamic 형태가 들어가며, 각 원소는 ,로 구분되고, 중첩이 가능하다.
 
 본격적인 코드에 착수하기 전에 필요한 데이터를 정리한 결과는 다음과 같다:
@@ -111,3 +111,15 @@ json의 형식은 다음과 같이 정리된다:
 - Google Maps API: 지도 기능을 사용하기 위한 API다.
     [시작하기 전에 | Google Maps for Flutter | Google for Developers](https://developers.google.com/maps/flutter-plugin/overview?hl=ko)
     [google_maps_flutter | Flutter Package](https://pub.dev/packages/google_maps_flutter)
+
+<hr>
+
+# 8/8 업데이트
+
+## json
+[@charlielee206](https://github.com/charlielee206) 이 Python으로 기존의 엑셀을 json으로 변환하는 스크립트를 만들었음.
+
+## flutter
+firebase - back - front 연동 확인함. MacOS, iOS 작동 확인. Android는 Gradle 버전 문제로 아직 확인하지 못함.
+웹 호환성 문제로 인해 internet_connection_checker -> internet_connection_checker_plus로 인터넷 모듈 교체.
+검색은 아직 [korean_regex](https://pub.dev/packages/korea_regexp/versions/0.0.2)를 다뤄봐야 함.
