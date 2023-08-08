@@ -1,0 +1,39 @@
+name: flutter_firebase_sample
+description: A new Flutter project.
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.6 <4.0.0'
+
+dependencies:
+  firebase_core: ^2.15.0
+  firebase_database: ^10.2.4
+  firebase_storage: ^11.2.5
+  flutter:
+    sdk: flutter
+  internet_connection_checker_plus: ^2.0.0
+  path_provider: ^2.0.15
+  cache_manager: ^1.0.0+4
+  korea_regexp: ^1.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+  fonts:
+    - family: NanumSquare_ac
+      fonts:
+        - asset: assets/fonts/NanumSquare_ac/NanumSquare_acEB.ttf
+          weight: 800
+        - asset: assets/fonts/NanumSquare_ac/NanumSquare_acB.ttf
+          weight: 600
+        - asset: assets/fonts/NanumSquare_ac/NanumSquare_acR.ttf
+          weight: 400
+        - asset: assets/fonts/NanumSquare_ac/NanumSquare_acL.ttf
+          weight: 200
