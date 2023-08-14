@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'back/data_fetch.dart';
+import 'package:korea_regexp/korea_regexp.dart';
 
+
+//입력: 태그리스트, 최근검색어리스트, 출력://검색어, 태그리스트, 최근검색어리스트
 class SearchPage extends StatefulWidget {
   const SearchPage({Key? key}) : super(key: key);
 
@@ -9,12 +13,7 @@ class SearchPage extends StatefulWidget {
 
 class SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
-  final List<String> tags = [
-    '#한식', '#양식', '#일식', '#중식', '#아침', '#점심', '#저녁', '#술약속',
-    '#짧은태그3', '#몹시매우미칠듯이긴태그',
-    '#한식', '#혼밥가능', '#신촌역', '#대흥', '#후문', '#정문', '#남문',
-    // ... 다른 태그들 추가 ...
-  ];
+
 
   @override
   void dispose() {
@@ -22,14 +21,54 @@ class SearchPageState extends State<SearchPage> {
     super.dispose();
   }
 
-  void _addTagToSearchBar(String tag) {
+  void clickTagBottons(int tag) {
     setState(() {
-      _searchController.text += "$tag ";
+      // selectedTags = []; //[](빈 리스트)로 수정 예정
+      // for (int i = 0; i < isSelected.length; i++) {
+      //   if (isSelected[i]) {
+      //     selectedTags.add(tags[i].substring(0)); //#제외
+      //   }else{
+      //     selectedTags.remove(tags[i].substring(0));
+      //   }
+      // }
+      if (isSelected[tag]) {
+        selectedTags.add(tags[tag]);
+      }else{
+        selectedTags.remove(tags[tag]);
+      }
     });
   }
-
+  void clickCategoryBottons(int cate) {
+    setState(() {
+      // selectedCates = []; //[](빈 리스트)로 수정 예정
+      // for (int i = 0; i < isSelectedCate.length; i++) {
+      //   if (isSelectedCate[i]) {
+      //     selectedCates.add(cate[i].substring(0)); //#제외
+      //   }else{
+      //     selectedCates.remove(cate[i].substring(0));
+      //   }
+      // }
+      if (isSelectedCate[cate]) {
+          selectedCates.add(categorys[cate]);
+        }else{
+          selectedCates.remove(categorys[cate]);
+      }
+    });
+  }
+  List<bool> isSelected = []; //태그들 선택여부 리스트
+  List<String> selectedTags = []; //선택된태그 리스트
+  List<bool> isSelectedCate = []; //카테고리 선택여부 리스트
+  List<String> selectedCates = []; //선택된카테고리 리스트
   String searchText = '';
-  List<String> recentSearches = [];
+  List<String> recentSearches = []; //최근검색어 리스트
+  late List<String> terms;
+
+  @override
+  void initState() {
+    super.initState();
+    isSelected = List.generate(tags.length, (index) => false); // isSelected 초기화
+    isSelectedCate = List.generate(categorys.length, (index) => false); // isSelectedCate 초기화
+  }
 
   void _submitSearch() {
     setState(() {
@@ -41,8 +80,17 @@ class SearchPageState extends State<SearchPage> {
         }
       });
     });
-    // 검색 기능을 구현하는 로직을 추가 or 검색어를 다른 페이지로 넘기기
-    // 검색어 넘기면서 페이지 이동하는 코드작성
+    // 검색 기능을 구현하는 로직을 추가
+
+    changeSearchTerm(searchText, selectedTags, selectedCates);
+
+    //검색어, 태그리스트, 최근검색어리스트를 다른 페이지로 넘기기
+  }
+
+  void clickRecentSearches() {
+    //최근검색어 눌렀을 때
+
+    //클릭한 최근검색어, 빈 태그리스트, 최근검색어리스트를 다른 페이지로 넘기기
   }
 
   void _removeSearchKeyword(String keyword) {
@@ -51,12 +99,43 @@ class SearchPageState extends State<SearchPage> {
     });
   }
 
-  String _truncateWithEllipsis(String text, int maxLength) {
-    if (text.length > maxLength) {
-      return '${text.substring(0, maxLength - 3)}...';
+  List<String> tag_check (List<String> tags, List<String> cate){
+    List<String> result = [];
+    List<int> tmp = Iterable<int>.generate(listfood.length).toList();
+    for( int i  = 0; i< tags.length ; i++){
+      tmp.removeWhere((item) => !tag[tags[i]].contains(item));
     }
-    return text;
+    for( int i  = 0; i< cate.length ; i++){
+      tmp.removeWhere((item) => !category[cate[i]].contains(item));
+    }
+    for( int i  = 0; i< tmp.length ; i++){
+      result.add(listfood[tmp[i]]["name"]);
+    }
+    return result;
   }
+
+  void changeSearchTerm(String text, List<String> tags,List<String> cate) {
+
+    print("태그 $tags");
+    print("카테고리 $cate");
+    List<String> list = tag_check(tags, cate) ;
+    print("리스트 $list");
+    RegExp regExp = getRegExp(
+        text,
+        RegExpOptions(
+          initialSearch: true,
+          startsWith: false,
+          endsWith: false,
+          fuzzy: false,
+          ignoreSpace: true,
+          ignoreCase: false,
+        ));
+    print(regExp);
+    terms =
+        list.where((element) => regExp.hasMatch(element)).toList();
+    print(terms);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -70,6 +149,7 @@ class SearchPageState extends State<SearchPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
+              //검색창
               height: 45,
               width: 330,
               decoration: BoxDecoration(
@@ -96,6 +176,9 @@ class SearchPageState extends State<SearchPage> {
                             hintText: 'Search',
                             border: InputBorder.none,
                           ),
+                          onSubmitted: (value) {
+                            _submitSearch(); // 엔터를 입력했을 때 동작
+                          },
                         ),
                       ),
                     ),
@@ -143,20 +226,48 @@ class SearchPageState extends State<SearchPage> {
                 spacing: 15,
                 runSpacing: 10,
                 children: [
-                  for (int i = 0; i < tags.length; i++)
+                  for (int i = 0; i < categorys.length; i++)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 210, 210, 210),
+                        color: isSelectedCate[i]
+                            ? Colors.amber[300]
+                            : const Color.fromARGB(255, 210, 210, 210),
                         border: Border.all(
-                          color: const Color.fromARGB(255, 210, 210, 210),
+                          color: isSelectedCate[i]
+                              ? const Color.fromARGB(255, 255, 213, 79)
+                              : const Color.fromARGB(255, 210, 210, 210),
                           width: 3,
                         ),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: InkWell(
                         onTap: () {
-                          _addTagToSearchBar(tags[i]);
+                          isSelectedCate[i] = !isSelectedCate[i];
+                          clickCategoryBottons(i);
+                        },
+                        child: Text(categorys[i]),
+                      ),
+                    ),
+                  for (int i = 0; i < tags.length; i++)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: isSelected[i]
+                            ? Colors.amber[300]
+                            : const Color.fromARGB(255, 210, 210, 210),
+                        border: Border.all(
+                          color: isSelected[i]
+                              ? const Color.fromARGB(255, 255, 213, 79)
+                              : const Color.fromARGB(255, 210, 210, 210),
+                          width: 3,
+                        ),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: InkWell(
+                        onTap: () {
+                          isSelected[i] = !isSelected[i];
+                          clickTagBottons(i);
                         },
                         child: Text(tags[i]),
                       ),
@@ -164,6 +275,22 @@ class SearchPageState extends State<SearchPage> {
                 ],
               ),
             ),
+            SizedBox(
+              //태그리스트 확인용, 지울 부분
+              child: Row(
+                children: [
+                  for (String tag in selectedTags)
+                    Container(
+                      margin: const EdgeInsets.only(right: 1),
+                      padding: const EdgeInsets.all(1),
+                      child: Text(tag),
+                    ),
+                ],
+              ),
+            ),
+            Row(
+                //검색어 확인용, 지울 부분
+                children: [Text('검색어: $searchText')]),
             const SizedBox(
               height: 30,
             ),
@@ -194,12 +321,19 @@ class SearchPageState extends State<SearchPage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        InkWell(
-                          onTap: () {
-                            _addTagToSearchBar(recentSearches[i]);
-                          },
-                          child: Text(
-                            _truncateWithEllipsis(recentSearches[i], 24),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () {
+                              setState(() {
+                                searchText = recentSearches[i];
+                              });
+                              clickRecentSearches();
+                            },
+                            child: Text(
+                              recentSearches[i],
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                            ),
                           ),
                         ),
                         IconButton(
