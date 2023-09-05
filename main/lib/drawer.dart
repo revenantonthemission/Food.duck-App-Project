@@ -3,7 +3,8 @@ import 'home_page.dart';
 import 'search_page.dart';
 import 'info.dart';
 import 'rand_condition.dart';
-import 'result.dart';
+import 'result_page.dart';
+import 'back/data_fetch.dart';
 
 class CustomDrawer extends StatelessWidget {
   const CustomDrawer({super.key});
@@ -40,15 +41,19 @@ class CustomDrawer extends StatelessWidget {
                 title: const Text(
                   '홈',
                   style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'NanumSquareB.ttf',
+                    fontSize: 32,
+                    fontFamily: "NanumSquare_ac",
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomePage()),
-                  );
+                  Navigator.pop(context);
+                  if(ModalRoute.of(context)!.settings.name!='/'){
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()), ((route) => false)
+                    );
+                  }
                 },
               ),
               const SizedBox(height: 20),
@@ -56,8 +61,9 @@ class CustomDrawer extends StatelessWidget {
                 title: const Text(
                   '랜덤 추천',
                   style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'NanumSquareB.ttf',
+                    fontSize: 32,
+                    fontFamily: "NanumSquare_ac",
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 onTap: () {
@@ -72,14 +78,16 @@ class CustomDrawer extends StatelessWidget {
                 title: const Text(
                   '검색',
                   style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'NanumSquareB.ttf',
+                    fontSize: 32,
+                    fontFamily: "NanumSquare_ac",
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SearchPage()),
+                  Navigator.pop(context);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => SearchPage()), ((route) => route.settings.name=='/')
                   );
                 },
               ),
@@ -88,22 +96,34 @@ class CustomDrawer extends StatelessWidget {
                 title: const Text(
                   '즐겨찾기',
                   style: TextStyle(
-                    fontSize: 30,
-                    fontFamily: 'NanumSquareB.ttf',
+                    fontSize: 32,
+                    fontFamily: "NanumSquare_ac",
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                onTap: () {},
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => searchList(liked,"즐겨찾기")), ((route) => route.settings.name=='/')
+                  );
+                },
               ),
               const SizedBox(height: 20),
               ListTile(
                 title: const Text(
                   'Info',
-                  style: TextStyle(fontSize: 30),
+                  style: TextStyle(
+                    fontSize: 32,
+                    fontFamily: "NanumSquare_ac",
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Info()),
+                  Navigator.pop(context);
+                  Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(builder: (context) => Info()), ((route) => route.settings.name=='/')
                   );
                 },
               ),
@@ -122,10 +142,11 @@ class CustomDrawer extends StatelessWidget {
                   onTap: () {
                     // 여기에 이미지가 눌렸을 때 다른 페이지로 이동하는 코드를 작성합니다.
                     // 예를 들면:
+                    /*
                     Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => Result()),
-                    );
+                    );*/
                   },
                   child: Image.asset(
                     'assets/images/icon.png',

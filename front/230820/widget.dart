@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/drawer.dart';
 
 const List<String> sliderValIndicators = ["5분", "10분", "20분", "30분", "30분 이상"];
 const List<String> listMenu = <String>[
@@ -21,6 +22,7 @@ const List<String> listCost = <String>[
   "15,000원 ~ 20,000원",
   "20,000원 이상"
 ];
+final liked = <String>[];
 
 String getDetails(time) {
   String result = "DEFAULT";
@@ -41,10 +43,6 @@ String getDetails(time) {
 
   return result;
 }
-
-
-
-
 
 class SubText extends StatelessWidget {
   final String title;
@@ -82,48 +80,10 @@ class SubText extends StatelessWidget {
     );
   }
 }
-class MemText extends StatelessWidget {
-  final String title;
-  final String details;
-  const MemText(this.title, this.details, {super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: 330-30,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(children: [
-            Text(
-            (title),
-            textAlign: TextAlign.start,
-            style: const TextStyle(
-              fontSize: 22-2,
-              fontFamily: "NanumSquare_ac",
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Text(
-            (details),
-            textAlign: TextAlign.start,
-            style: const TextStyle(
-              fontSize: 18,
-              fontFamily: "NanumSquare_ac",
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-          ],
-        )
-          
-        ],
-      ),
-    );
-  }
-}
-class iconSection extends StatelessWidget {
-  const iconSection({super.key});
+class IconSection extends StatelessWidget {
+  //앱바 사용시 불필요
+  const IconSection({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -144,9 +104,9 @@ class iconSection extends StatelessWidget {
   }
 }
 
-class titleSection extends StatelessWidget {
+class TitleSection extends StatelessWidget {
   final String title;
-  const titleSection(this.title, {super.key});
+  const TitleSection(this.title, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -160,8 +120,7 @@ class titleSection extends StatelessWidget {
             style: const TextStyle(
                 fontSize: 36,
                 fontFamily: "NanumSquare_ac",
-                fontWeight: FontWeight.w600
-            ),
+                fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -234,6 +193,58 @@ class _LocationSliderState extends State<LocationSlider> {
   }
 }
 
+class DropdownChoice extends StatefulWidget {
+  final List<String> list;
+  const DropdownChoice(this.list, {super.key});
+
+  @override
+  State<DropdownChoice> createState() => _DropdownChoiceState();
+}
+
+class _DropdownChoiceState extends State<DropdownChoice> {
+  String dropdownValue = "선택하세요.";
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 320.0,
+      height: 40.0,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(width: 2, color: Colors.amber),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: ButtonTheme(
+          alignedDropdown: true,
+          child: DropdownButton(
+            value: dropdownValue,
+            icon: const Icon(Icons.keyboard_arrow_down),
+            elevation: 10,
+            style: const TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontFamily: "NanumSquare_ac",
+              fontWeight: FontWeight.w400,
+            ),
+            onChanged: (String? value) {
+              setState(() {
+                dropdownValue = value!;
+              });
+            },
+            items: widget.list.map<DropdownMenuItem<String>>((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
 
@@ -274,6 +285,110 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class searchList extends StatefulWidget {
+  final List<String> resultName;
+  final List<String> resultDesc;
+  final List<int> listIndex;
+  final String titleString;
+  const searchList(this.resultName, this.resultDesc, this.listIndex, this.titleString);
+
+  @override
+  _searchListState createState() => _searchListState();
+}
+
+class _searchListState extends State<searchList> {
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  var names = <String>[];
+  var descriptions = <String>[];
+  var targetIndex = <int>[];
+  var selectedName = <String>[];
+  var selectedDesc = <String>[];
+
+  @override
+  void initState() {
+    names = widget.resultName;
+    descriptions = widget.resultDesc;
+    targetIndex = widget.listIndex;
+    if (targetIndex.isEmpty) {
+      selectedName = names;
+      selectedDesc = descriptions;
+      // 이 부분의 경우 결과 없음이 나와야 함. 수정 필요함. 즐겨찾기 결과가 없는 경우에도 이리로 옴. 양쪽 다 쓸 수 있는 문구로!
+    }
+    else if (targetIndex[0] == -1) {
+      selectedName = names;
+      selectedDesc = descriptions;
+      // 즐겨찾기
+    }
+    else {
+      for (int i = 0; i < targetIndex.length; i++) {
+        selectedName.add(names[targetIndex[i]]);
+        selectedDesc.add(descriptions[targetIndex[i]]);
+      }
+    }
+    super.initState();
+  }
+
+  Widget _resultList() {
+    return ListView.separated(
+      itemCount: selectedName.length+2,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return TitleSection(widget.titleString);
+        }
+        else if (index == selectedName.length + 1) {
+          return Container();
+        }
+        else {
+          return ListTile(
+            title: Text(selectedName[index-1]),
+            subtitle: Text(selectedDesc[index-1]),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 30),
+            trailing: IconButton(
+              icon: Icon(
+                liked.contains(selectedName[index-1]) ? Icons.star : Icons.star_border,
+                color: liked.contains(selectedName[index-1]) ? Colors.yellow : null,
+                semanticLabel: liked.contains(selectedName[index-1]) ? 'Remove from saved' : 'Save',
+                size: 35,
+              ),
+              onPressed: (){
+                setState(() {
+                  if (liked.contains(selectedName[index-1])) {
+                    liked.remove(selectedName[index-1]);
+                  } else {
+                    liked.add(selectedName[index-1]);
+                  }
+                });
+              },
+            ),
+          );
+        }
+      },
+      separatorBuilder: (context, index) {
+        return const Divider(thickness: 1.5, indent: 20, endIndent: 20,);
+      },
+      scrollDirection: Axis.vertical,
+      shrinkWrap: true,
+    );
+  }
+
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: scaffoldKey,
+      appBar: CustomAppBar(scaffoldKey: scaffoldKey),
+      endDrawer: const SafeArea(
+        child: Drawer(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(50), bottomLeft: Radius.circular(50)),
+          ),
+          child: CustomDrawer(), // CustomDrawer 위젯 사용
+        ),
+      ),
+      body: _resultList(),
     );
   }
 }

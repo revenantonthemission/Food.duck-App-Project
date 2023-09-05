@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
@@ -17,7 +16,9 @@ Map trav_time = {};
 Map tag = {};
 List<int> listmeta = [];
 List<String> tags = [];
-List<String> categorys = [];
+List<String> categorys = <String> [];
+List<String> recentSearches = []; //최근검색어 리스트
+List<int> liked = [];
 
 Future<int> makelist(var parsed_list) async {
   int idx = 0;
@@ -46,9 +47,13 @@ Future<int> makelist(var parsed_list) async {
         tag[j].add(idx);
       }
     }
-    if (await InitCaches(i["name"]) == 0) {
+    var tmp = await ReadCaches(i["name"]);
+    if (tmp!.length == 0) {
       WriteCaches(i["name"], '0');
+    } else {
+      if (tmp == '1') liked.add(idx);
     }
+
     idx++;
   }
   return 0;
@@ -56,6 +61,13 @@ Future<int> makelist(var parsed_list) async {
 
 Future<int> init(CounterStorage cs) async {
   bool result = await InternetConnection().hasInternetAccess;
+  var cache_status = await InitCaches('recentSearches');
+  var cache = await ReadCaches('recentSearches'); // recentSearches 초기화
+  if (cache!.isNotEmpty) {
+    recentSearches = cache.split('\n');
+  } else {
+    recentSearches = [];
+  }
   if (result == true) {
     print("Internet Connected");
     try {
@@ -72,21 +84,17 @@ Future<int> init(CounterStorage cs) async {
         const oneMegabyte = 1024 * 1024;
         final data = await datapath.getData(oneMegabyte);
         final String fooddata = utf8.decode(data!);
-        print(fooddata);
 
         await InitCaches('food');
         await WriteCaches('food', fooddata);
 
         listfood = jsonDecode(fooddata);
-        print(listfood);
         await makelist(listfood);
         // Data for "images/island.jpg" is returned, use this as needed.
       } on FirebaseException catch (e) {
         print("{$e}");
         // Handle any errors.
       }
-
-      InitCaches('recentSearches');
 
       return 0;
     } catch (e) {
@@ -126,6 +134,7 @@ Future<int?> InitCaches(var k) async {
       valueType: ValueType.StringValue,
       actionIfNull: () {
         CacheResult = 0;
+        recentSearches = [];
       },
       actionIfNotNull: () {
         CacheResult = 1;
@@ -135,12 +144,14 @@ Future<int?> InitCaches(var k) async {
 
 Future<String?> WriteCaches(var k, var st) async {
   WriteCache.setString(key: k, value: st);
+  return '0';
 }
 
 Future<String?> ReadCaches(var k) async {
   dynamic DasData = '';
   var DasValue = await ReadCache.getString(key: k);
   DasData = DasValue.toString();
+  if (DasData == 'null') DasData = '';
   return DasData;
 }
 
