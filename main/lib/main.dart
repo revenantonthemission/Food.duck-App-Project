@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import 'back/data_fetch.dart';
+
+_checkDataFetch() {
+  CounterStorage storage = CounterStorage();
+  init(storage);
+}
 
 void main() {
-  // _checkDataFetch();
+  //Firebase에서 데이터 가져오기
+  _checkDataFetch();
+  //앱 실행
   runApp(const MyApp());
 }
 

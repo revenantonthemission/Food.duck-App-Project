@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:project2307/result_with.dart';
+import 'loading.dart';
 import 'drawer.dart';
-import 'search_page.dart';
+import 'search_recent.dart';
 import 'back/data_fetch.dart';
 import 'dart:async';
-import 'result.dart';
 import 'dart:math';
 
 bool isloaded = false;
@@ -14,72 +15,69 @@ class HomePage extends StatefulWidget {
   @override
   _HomePage createState() => _HomePage();
 }
+
 class _HomePage extends State<HomePage> {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   late bool loaded;
   var check;
 
+  //Widget Lifecycle : initState -> build -> dispose
   @override
-  void initState(){
+  void initState() {
     super.initState();
     setState(() {
       loaded = isloaded;
     });
-    if(!loaded){
+    if (!loaded) {
+      //테스트 코드로 추측됨.
       _checkDataFetch().then((value) {
         setState(() {
           check = value;
         });
-        print("check : $check");
-        Timer(Duration(seconds: 3), () {
-          if(check == 0){
+        //3초 대기
+        Timer(const Duration(seconds: 3), () {
+          //데이터 가져오기 성공
+          if (check == 0) {
             setState(() {
               isloaded = true;
               loaded = true;
             });
-          }else{
+          } else {
+            //실패시 앱 종료
             SystemNavigator.pop();
           }
         });
       });
     }
-
   }
-  Future<int> _checkDataFetch() async{
+
+  //2번 실행??
+  Future<int> _checkDataFetch() async {
     CounterStorage storage = CounterStorage();
     var t = await init(storage);
-    print(t);
-    print("name");
-    name.forEach((key, value) => print('${key} : ${value}'));
-    print("tag");
-    tag.forEach((key, value) => print('${key} : ${value}'));
-    print("category");
-    category.forEach((key, value) => print('${key} : ${value}'));
-    print("trav_time");
-    trav_time.forEach((key, value) => print('${key} : ${value}'));
-    print(tags);
-    print(categorys);
     return t;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
-    if(loaded){
+    var screenwidth = MediaQuery.of(context).size.width;
+    //데이터가 다 로드되면 화면을 그리고, 그렇지 않으면 로딩 페이지를 그림
+    if (loaded) {
       return Scaffold(
         key: scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
           //drawer기능 때문에 Appbar 필요
+          automaticallyImplyLeading: false,
           toolbarHeight: 60,
           backgroundColor: Colors.transparent,
-          elevation: 0, // 그림자
+          elevation: 0,
           actions: [
             Padding(
               padding: const EdgeInsets.only(
                   right: 20.0), //top:10 하거나 Appbar의 height올릴수도 있음
               child: IconButton(
+                padding: EdgeInsets.zero,
                 icon: const Icon(
                   Icons.menu,
                   color: Colors.black,
@@ -92,25 +90,27 @@ class _HomePage extends State<HomePage> {
             ),
           ],
         ),
+        //위젯 고정
         endDrawer: const SafeArea(
           child: Drawer(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(50), bottomLeft: Radius.circular(50)),
+                  topLeft: Radius.circular(50),
+                  bottomLeft: Radius.circular(50)),
             ),
             child: CustomDrawer(), // CustomDrawer 위젯 사용
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30),
+        //UI 오버플로우 방지
+        body: SingleChildScrollView(
           child: Column(
             children: [
-              Expanded(
-                flex: 2,
+              SizedBox(
+                height: 80,
                 child: Container(),
               ),
-              Expanded(
-                flex: 7,
+              SizedBox(
+                height: 400,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -124,7 +124,7 @@ class _HomePage extends State<HomePage> {
                     ),
                     Image.asset(
                       'assets/images/logo.jpg', //협의수정필요
-                      width:  MediaQuery.of(context).size.width,
+                      width: 320,
                     ),
                     const SizedBox(
                       height: 20,
@@ -132,41 +132,39 @@ class _HomePage extends State<HomePage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
+                        //검색창
                         InkWell(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => const SearchPage()),
+                                  builder: (context) => const SearchRecent()),
                             );
                           },
-                          child: FittedBox(
-                            child: Container(
-                              //검색창 (실시간 반영,제안:onChanged()/TextField)
-                              height: 45,
-                              width:  MediaQuery.of(context).size.width - 60,
-                              decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                    color: Colors.amber,
-                                    width: 3,
-                                  ),
-                                  borderRadius: BorderRadius.circular(50)),
-                              child: const SizedBox(
-                                height: 35,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.search,
-                                        size: 20,
-                                        color: Colors.black,
-                                      ),
-                                      onPressed: null,
-                                    ),
-                                  ],
+                          child: Container(
+                            height: 45,
+                            width: screenwidth < 600 ? screenwidth - 80 : 520,
+                            decoration: BoxDecoration(
+                                color: Colors.white,
+                                border: Border.all(
+                                  color: Colors.amber,
+                                  width: 3,
                                 ),
+                                borderRadius: BorderRadius.circular(50)),
+                            child: const SizedBox(
+                              height: 35,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(
+                                      Icons.search,
+                                      size: 20,
+                                      color: Colors.black,
+                                    ),
+                                    onPressed: null,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
@@ -174,61 +172,54 @@ class _HomePage extends State<HomePage> {
                       ],
                     ),
                     const SizedBox(
-                      height: 5,
+                      height: 20,
                     ),
-                    TextButton(
-                      onPressed: () {
+                    //I'm Feeling Hungry 랜덤 검색
+                    InkWell(
+                      onTap: () {
+                        // 버튼을 클릭하면 다른 페이지로 이동
                         var rand = Random().nextInt(listfood.length);
+                        List<dynamic> leftlist =
+                            List<int>.generate(listfood.length, (i) => i);
+                        //List->Set->List (중복제거), remove(rand) : rand번째 요소 제거 -> 한 번 뽑은 곳은 다시 뽑지 않음.
+                        leftlist.toSet().toList().remove(rand);
+                        //랜덤검색 페이지로 이동
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => resultlist(rand)),
+                              builder: (context) =>
+                                  resultlist_with(rand, leftlist)),
                         );
                       },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black, // Text Color
-                      ),
-                      child: const Text(
-                        "I'm Feeling Hungry",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontFamily: "NanumSquare_ac",
-                          fontWeight: FontWeight.w400,
+                      child: Container(
+                        height: 50,
+                        width: 250,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10)),
+                        child: const Text(
+                          "I’m Feeling Hungry",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontFamily: "NanumSquare_ac",
+                            fontWeight: FontWeight.w400,
+                          ),
                         ),
                       ),
+                    ),
+                    const SizedBox(
+                      height: 80,
                     ),
                   ],
                 ),
               ),
-              Expanded(
-                flex: 4,
-                child: Container(),
-              ),
             ],
           ),
         ),
       );
-    }else{
-      return Scaffold(
-        key: scaffoldKey,
-        backgroundColor: Colors.white,
-        body: Container(
-          alignment: Alignment.center,
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(border: Border.all(color: Colors.grey)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Image.asset(
-                'assets/images/icon.png',
-                height: MediaQuery.of(context).size.width * 0.4,
-                width: MediaQuery.of(context).size.width * 0.4,
-              ),
-            ],
-          ),
-        ),
-      );
+    } else {
+      //로딩창 띄우기
+      return const LoadingPage();
     }
   }
 }
